@@ -1,5 +1,5 @@
 class Matrix:
-    def __init__(self, rows, columns):
+    def __init__(self, rows, columns, init_value=0):
         assert isinstance(rows, int) and rows > 0, \
             "'rows' must be an integer greater than 0"
         assert isinstance(columns, int) and columns > 0, \
@@ -7,12 +7,75 @@ class Matrix:
         
         self._rows = rows
         self._cols = columns
-        self._core = [[0 for _ in range(columns)] for _ in range(rows)]
+        self._core = [[init_value for _ in range(columns)] for _ in range(rows)]
+
+
+    def __getitem__(self, key):
+        assert isinstance(key, tuple) and len(key) == 2 and \
+            isinstance(key[0], int) and 0 <= key[0] < self._rows and \
+            isinstance(key[1], int) and 0 <= key[1] < self._cols, \
+            "'index' operation went wrong"
+        
+        return self._core[key[0]][key[1]]
+
+    def __setitem__(self, key, value):
+        assert isinstance(key, tuple) and len(key) == 2 and \
+            isinstance(key[0], int) and 0 <= key[0] < self._rows and \
+            isinstance(key[1], int) and 0 <= key[1] < self._cols, \
+            "'index' operation went wrong"
+        
+        self._core[key[0]][key[1]] = value
+
+
+    def _shape(self):
+        return self._rows, self._cols
+
+    def __add__(self, other):
+        assert isinstance(other, Matrix), \
+            f"'add' operation not supported with '{type(other).__name__}' type"
+        assert self._shape() == other._shape(), \
+            "'add' operation not supported for matrixes with different shape"
+        
+        res = Matrix(self._rows, self._cols)
+        for i in range(self._rows):
+            for j in range(self._cols):
+                res[i, j] = self[i, j] + other[i, j]
+        
+        return res
 
 
     def _row(self, index):
-        return (x for x in self._core[index])
-
+        return [x for x in self._core[index]]
 
     def _column(self, index):
-        return (r[index] for r in self._core)
+        return [r[index] for r in self._core]
+
+    def __mul__(self, other):
+        if isinstance(other, Matrix):
+            assert self._cols == other._rows, \
+                """'mul' operation not supported: the number of columns of 
+                left-side matrix doesn't match with the number of rows of the 
+                right-side matrix"""
+            
+            res = Matrix(self._rows, other._cols)
+            for i in range(self._rows):
+                r = self._row(i)
+                
+                for j in range(other._cols):
+                    c = other._column(j)
+
+                    res[i, j] = sum([rv*cv for rv, cv in zip(r, c)])
+            
+            return res
+
+        if isinstance(other, (int, float)):
+            res = Matrix(self._rows, self._cols)
+            for i in range(self._rows):
+                for j in range(self._cols):
+                    res[i, j] = self[i, j] * other
+            
+            return res
+        
+        raise AssertionError(
+            f"'mul' operation not supported with '{type(other).__name__}' type"
+        )
