@@ -110,3 +110,9 @@ class Matrix:
         raise AssertionError(
             f"'mul' operation not supported with '{type(other).__name__}' type"
         )
+
+
+    def __iter__(self):
+        for i in range(self._rows):
+            for j in range(self._cols):
+                yield self[i, j]
