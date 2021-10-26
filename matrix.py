@@ -1,3 +1,6 @@
+import re
+
+
 class Matrix:
     def __init__(self, rows, columns, init_value=0):
         assert isinstance(rows, int) and rows > 0, \
@@ -25,6 +28,34 @@ class Matrix:
             "'index' operation went wrong"
         
         self._core[key[0]][key[1]] = value
+
+
+    def __getattr__(self, name):
+        if re.fullmatch(r'_\d+_\d+', name):
+            i_str, j_str = name.split('_')[1:]
+            i, j = int(i_str), int(j_str)
+
+            return self[i, j]
+        
+        if re.fullmatch(r'as_[a-zA-Z]+', name):
+            t_str = name[3:]
+            t = eval(t_str)
+
+            res = Matrix(self._rows, self._cols)
+            for i in range(self._rows):
+                for j in range(self._cols):
+                    res[i, j] = t(self[i, j])
+            
+            return res
+
+    def __setattr__(self, name, value):
+        if re.fullmatch(r'_\d+_\d+', name):
+            i_str, j_str = name.split('_')[1:]
+            i, j = int(i_str), int(j_str)
+
+            self[i, j] = value
+        else:
+            super().__setattr__(name, value)
 
 
     def _shape(self):
