@@ -31,3 +31,8 @@ if __name__ == '__main__':
 
     # Uso de iterador:
     print('- m3 en forma de iterador (lista):', [i for i in m3.__iter__()] , '\n')
+
+    # Uso de Matrix.as_type:
+    m3.as_float.print('m3<float>')
+    m3.as_str.print('m3<string>')
+    (m2 * 0.3 + m3.as_float).print('m2*0.3 + m3<float>')

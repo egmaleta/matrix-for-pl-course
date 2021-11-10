@@ -156,3 +156,8 @@ class Matrix:
     def print(self, name=''):
         name = f'{name}:\n' if name else ''
         print(f'\n{name}{str(self)}')
+
+    @classmethod
+    def evalprint(cls, expr):
+        print( f'{expr}:' )
+        print( eval(expr) )
